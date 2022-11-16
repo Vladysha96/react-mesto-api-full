@@ -1,0 +1,20 @@
+.header__exit {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 22px;
+    text-decoration: none;
+    cursor: pointer;
+    color: #FFFFFF;
+    margin-right: 27px;
+    font-family: 'Inter', 'Arial', 'Helvetica', sans-serif;
+}
+
+.header__exit:hover {
+    color: #A9A9A9;
+}
+
+@media screen and (min-width:935px) {
+    .header__exit {
+        margin-right: 0;
+    }
+}

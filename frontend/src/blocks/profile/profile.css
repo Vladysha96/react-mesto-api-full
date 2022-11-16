@@ -1,0 +1,19 @@
+.profile {
+    margin: 0 0 36px;
+    display: grid;
+    max-width: 100%;
+    color: #fff;
+    grid-template-columns: 1fr;
+}
+
+@media screen and (min-width:650px) {
+    .profile {
+        grid-template-columns: max-content minmax(62%, 1fr) 1fr;
+        margin: 0 0 51px;
+        column-gap: 18px;
+    }
+}
+
+
+
+

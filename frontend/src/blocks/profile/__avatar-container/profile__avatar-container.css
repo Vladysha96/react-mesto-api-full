@@ -1,0 +1,14 @@
+.profile__avatar-container {
+    background-image: url(../../../images/Avatar_edit.png);
+    background-position: 50%;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+}
+
+@media screen and (min-width:650px) {
+    .profile__avatar-container {  
+        margin-right: 12px;
+    }
+}
+

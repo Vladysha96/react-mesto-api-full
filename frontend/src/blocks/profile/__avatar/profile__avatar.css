@@ -1,0 +1,13 @@
+.profile__avatar {
+    border-radius: 50%;
+    justify-self: center;
+    max-width: 120px;
+    max-height: 120px;
+    cursor: pointer;
+    transition: all 0.15s ease-in;
+}
+
+
+.profile__avatar:hover {
+    opacity: 0.2;
+}

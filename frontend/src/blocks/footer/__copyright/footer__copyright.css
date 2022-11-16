@@ -1,0 +1,7 @@
+.footer__copyright {
+    margin: 0;
+    font-weight: 400;
+    font-size: clamp(0.875em, (0.2em + 2vw), 1.125em);
+    line-height: 1.22;
+    color: #545454;
+}

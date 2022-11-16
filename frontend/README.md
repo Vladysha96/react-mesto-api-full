@@ -45,15 +45,11 @@ ___
 * Git
 ___ 
 
-# Техническая информация
+В будущем хотелось бы внести следующие изменения на своей странице: 
 
-- Бэкенд реализован при помощи Node.js с применением веб-фреймворка Express, а также базы данных MongoDB;
-- Сервер развёрнут при помощи виртуальной машины Яндекс.Облако.
+- [ ] Добавить возможность добавления видео-элементов; 
 
-___ 
+- [ ] Добавить возможность перевода языка страницы. 
 
-* IP 51.250.21.206
-* Frontend https://vladysha96.frontend.nomoredomains.icu
-* Backend https://vladysha96.backend.nomoredomains.icu
 
-[Ссылка на сайт](https://vladysha96.frontend.nomoredomains.icu)
+**_[Cсылка на проект](https://Vladysha96.github.io/react-mesto-auth/)_**

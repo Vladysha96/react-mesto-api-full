@@ -1,0 +1,16 @@
+.popup__title {
+    box-sizing: border-box;
+    color: #000;
+    font-size: clamp(1.125em, (0.1em + 3vw), 1.5em);
+    line-height: 1.22;
+    font-weight: 900;
+    margin: 0;
+    padding: 0 0 75px;
+}
+
+@media screen and (min-width:520px) {
+    .popup__title {
+        padding: 0 0 54px;
+    }
+
+}
