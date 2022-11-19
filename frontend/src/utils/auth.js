@@ -1,14 +1,14 @@
-const BASE_URL = "https://auth.nomoreparties.co";
+export const BASE_URL = 'https://vladysha96.backend.nomoredomains.icu';
 
-const request = ({url, token, method = "POST", data}) => {
+const request = ({ url, token, method = "POST", data }) => {
     return fetch(`${BASE_URL}${url}`, {
         method,
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            ...(!!token && {'Authorization': `Bearer ${token}`}),
+            ...(!!token && { 'Authorization': `Bearer ${token}` }),
         },
-        ...(!!data && {body: JSON.stringify(data)}),
+        ...(!!data && { body: JSON.stringify(data) }),
     }).then((res) => {
         if (res.ok) {
             return res.json();
@@ -19,13 +19,13 @@ const request = ({url, token, method = "POST", data}) => {
 export const register = (email, password) => {
     return request({
         url: "/signup",
-        data: {email, password},
+        data: { email, password },
     });
 }
 export const login = (email, password) => {
     return request({
         url: "/signin",
-        data: {email, password},
+        data: { email, password },
     });
 }
 export const checkToken = (token) => {
@@ -35,3 +35,8 @@ export const checkToken = (token) => {
         token,
     });
 }
+export const logout = () => {
+    return request({
+        url: '/logout',
+    });
+};

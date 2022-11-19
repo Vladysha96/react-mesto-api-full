@@ -1,6 +1,11 @@
 const allowedCors = [
   'https://vladysha96.frontend.nomoredomains.icu',
   'http://vladysha96.frontend.nomoredomains.icu',
+  'https://vladysha96.backend.nomoredomains.icu',
+  'http://vladysha96.backend.nomoredomains.icu',
+  'localhost:3000',
+  'localhost:3001',
+  'http://localhost:',
 ];
 
 // eslint-disable-next-line consistent-return

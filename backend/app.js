@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
@@ -28,5 +29,5 @@ app.use(routes);
 app.use(errorLogger);
 app.use(errors());
 app.use(centralizedErrorHandler);
-
+console.log(process.env.NODE_ENV);
 app.listen(PORT);

@@ -1,98 +1,91 @@
 class Api {
-    constructor({ baseUrl, headers }) {
-        this._address = baseUrl;
-        this._token = headers.authorization;
+    constructor(data) {
+        this._baseUrl = data.baseUrl;
+        this._headers = data.headers;
     }
 
-    _handleResponse = (response) => {
-        return response.ok
-            ? response.json()
-            : Promise.reject(`Ошибка, код: ${response.status}`);
-    };
+    _checkResult(res) {
+        if (res.ok) {
+            return res.json();
+        }
 
-    setAvatar({ avatar }) {
-        return fetch(`${this._address}/users/me/avatar`, {
-            method: "PATCH",
-            headers: {
-                authorization: this._token,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                avatar,
-            }),
-        }).then(this._handleResponse);
-    }
-
-    getUserInfo() {
-        return fetch(`${this._address}/users/me`, {
-            headers: {
-                authorization: this._token,
-            },
-        }).then(this._handleResponse);
-    }
-
-    setUserInfo({ name, about }) {
-        return fetch(`${this._address}/users/me`, {
-            method: "PATCH",
-            headers: {
-                authorization: this._token,
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                name,
-                about,
-            }),
-        }).then(this._handleResponse);
+        return Promise.reject(`Ошибка: ${res.status}`);
     }
 
     getInitialCards() {
-        return fetch(`${this._address}/cards`, {
-            headers: {
-                authorization: this._token,
-            },
-        }).then(this._handleResponse);
+        return fetch(`${this._baseUrl}/cards`, {
+            credentials: 'include',
+            method: 'GET',
+            headers: this._headers,
+        }).then(this._checkResult);
     }
 
-    addItem({ name, link }) {
-        return fetch(`${this._address}/cards`, {
-            method: "POST",
-            headers: {
-                authorization: this._token,
-                "Content-Type": "application/json",
-            },
+    getUserInfo() {
+        return fetch(`${this._baseUrl}/users/me`, {
+            credentials: 'include',
+            method: 'GET',
+            headers: this._headers,
+        }).then(this._checkResult);
+    }
+
+    setUserInfo(data) {
+        return fetch(`${this._baseUrl}/users/me`, {
+            credentials: 'include',
+            method: 'PATCH',
+            headers: this._headers,
             body: JSON.stringify({
-                name,
-                link,
+                name: data.name,
+                about: data.about,
             }),
-        }).then(this._handleResponse);
+        }).then(this._checkResult);
     }
 
-    deleteItem(id) {
-        return fetch(`${this._address}/cards/${id}`, {
-            method: "DELETE",
-            headers: {
-                authorization: this._token,
-            },
-        }).then(this._handleResponse);
+    addNewCard(data) {
+        return fetch(`${this._baseUrl}/cards`, {
+            credentials: 'include',
+            method: 'POST',
+            headers: this._headers,
+            body: JSON.stringify({
+                name: data.name,
+                link: data.link,
+            }),
+        }).then(this._checkResult);
     }
 
-    changeLikeCardStatus(cardId, isLikeActive) {
-        return fetch(`${this._address}/cards/${cardId}/likes`, {
-            method: `${isLikeActive ? "PUT" : "DELETE"}`,
-            headers: {
-                authorization: this._token,
-            },
-        }).then(this._handleResponse);
+    deleteCard(cardId) {
+        return fetch(`${this._baseUrl}/cards/${cardId}`, {
+            credentials: 'include',
+            method: 'DELETE',
+            headers: this._headers,
+        }).then(this._checkResult);
+    }
+
+    changeLikeCardStatus(cardId, isLiked) {
+        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+            credentials: 'include',
+            method: `${isLiked ? 'PUT' : 'DELETE'}`,
+            headers: this._headers,
+        }).then(this._checkResult);
+    }
+
+    setUserAvatar(data) {
+        return fetch(`${this._baseUrl}/users/me/avatar`, {
+            credentials: 'include',
+            method: 'PATCH',
+            headers: this._headers,
+            body: JSON.stringify({
+                avatar: data.avatar,
+            }),
+        }).then(this._checkResult);
     }
 }
 
 const api = new Api({
-    baseUrl: "https://mesto.nomoreparties.co/v1/cohort-47",
+    baseUrl: 'https://vladysha96.backend.nomoredomains.icu',
+    credentials: 'include',
     headers: {
-        authorization: "006b2a45-8a19-43bd-94b2-0b41d4763e8c",
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
     },
 });
 
 export default api;
-

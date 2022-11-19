@@ -1,7 +1,7 @@
 import PopupWithForm from "./PopupWithForm";
 
 const SubmitPopup = props => {
-    const { isOpen, onClose, onSubmitDelete, card } = props;
+    const { isOpen, onClose, onSubmitDelete, card, isLoading } = props;
 
     const handleSubmit = (evt) => {
         evt.preventDefault();
@@ -14,8 +14,10 @@ const SubmitPopup = props => {
             name="delete-card"
             title="Вы уверены?"
             onClose={onClose}
+            isLoading={isLoading}
             onSubmit={handleSubmit}
-            buttonText="Да"
+            buttonText={isLoading ? "Удаление..." : "Да"}
+            isValid={true}
         >
         </PopupWithForm>
     );

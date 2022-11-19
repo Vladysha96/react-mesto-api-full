@@ -1,20 +1,26 @@
-import { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import useFormAndValidation from '../hooks/useFormAndValidation';
 
-const Register = (props) => {
-    const [password, setPassword] = useState('');
-    const [email, setEmail] = useState('');
+const initValues = {
+    email: '',
+    password: '',
+};
 
-    const handleEmailChange = (evt) => {
-        setEmail(evt.target.value);
-    }
-    const handlePasswordChange = (evt) => {
-        setPassword(evt.target.value);
-    }
+function Register({ onRegister }) {
+
+    const { values, errors, isValid, handleChange, setIsValid, resetForm } =
+        useFormAndValidation(initValues);
+
+    useEffect(() => {
+        setIsValid(false);
+        // eslint-disable-next-line
+    }, []);
 
     const handleSubmit = (evt) => {
         evt.preventDefault();
-        props.handleRegistration(email, password);
+        const { email, password } = values;
+        onRegister(email, password).then(() => resetForm());
     }
 
     return (
@@ -27,21 +33,34 @@ const Register = (props) => {
                     id="email"
                     type="email"
                     placeholder="Email"
-                    minLength={2}
-                    value={email || ''}
-                    onChange={handleEmailChange}
                     required
+                    minLength='6'
+                    maxLength='40'
+                    value={values.email || ""}
+                    onChange={handleChange}
+                    isValid={isValid}
                 />
+                {errors.email && (
+                    <span className='popup__input-error popup__input-error_visible'>{errors.email}</span>
+                )}
+
                 <input
                     className="login__input"
                     name="password"
                     id="password"
                     type="password"
                     placeholder="Пароль"
-                    value={password || ''}
-                    onChange={handlePasswordChange}
                     required
+                    minLength='6'
+                    maxLength='40'
+                    value={values.password || ""}
+                    onChange={handleChange}
+                    isValid={isValid}
                 />
+                {errors.password && (
+                    <span className='popup__input-error popup__input-error_visible'>{errors.password}</span>
+                )}
+
                 <button
                     className="login__button"
                     type="submit"

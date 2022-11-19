@@ -14,7 +14,7 @@ import Register from './Register.js';
 import ProtectedRoute from './ProtectedRoute';
 import InfoTooltip from './InfoTooltip';
 import PopupWithBurger from './PopupWithBurger';
-import * as auth from '../utils/auth.js'
+import * as auth from '../utils/auth.js';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 
 const App = () => {
@@ -62,18 +62,13 @@ const App = () => {
     }
   }, [history])
 
-  const handleMenuClick = () => {
-    setMenuOpen(!isMenuOpen)
-  }
-
   const handleRegistration = (email, password) => {
-    auth.register(email, password)
-      .then((data) => {
-        if (data) {
-          setStatus(true)
-          setInfoTooltipOpen(true)
-          history.push('/sign-in');
-        }
+    return auth
+      .register(email, password)
+      .then(() => {
+        setStatus(true)
+        setInfoTooltipOpen(true)
+        history.push('/sign-in');
       })
       .catch((err) => {
         setStatus(false)
@@ -83,14 +78,17 @@ const App = () => {
   }
 
   const handleLogin = (email, password) => {
-    auth.login(email, password)
-      .then((data) => {
-        if (data.token) {
-          localStorage.setItem('token', data.token)
-          setEmail(email);
-          setLoggedIn(true);
-          history.push('/');
+    return auth
+      .login(email, password)
+      .then((token) => {
+        if (!token) {
+          return Promise.reject('No token');
         }
+
+        localStorage.setItem('token', token)
+        setEmail(email);
+        setLoggedIn(true);
+        history.push('/');
       })
       .catch((err) => {
         setInfoTooltipOpen(true);
@@ -102,6 +100,10 @@ const App = () => {
     localStorage.removeItem('jwt');
     setLoggedIn(false);
     history.push('/sign-in');
+    setMenuOpen(!isMenuOpen)
+  }
+
+  const handleMenuClick = () => {
     setMenuOpen(!isMenuOpen)
   }
 
@@ -263,11 +265,11 @@ const App = () => {
           />
 
           <Route path="/sign-up">
-            <Register handleRegistration={handleRegistration} />
+            <Register onRegister={handleRegistration} />
           </Route>
 
           <Route path="/sign-in">
-            <Login handleLogin={handleLogin} />
+            <Login onLogin={handleLogin} />
           </Route>
 
         </Switch>

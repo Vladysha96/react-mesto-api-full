@@ -1,8 +1,9 @@
 import PopupWithForm from "./PopupWithForm";
 import { useEffect, useRef } from "react";
+import useFormAndValidation from '../hooks/useFormAndValidation';
 
 const EditAvatarPopup = props => {
-    const { isOpen, onClose, onUpdateAvatar } = props;
+    const { isOpen, onClose, onUpdateAvatar, isLoading } = props;
 
     const avatarRef = useRef();
 
@@ -13,28 +14,44 @@ const EditAvatarPopup = props => {
         });
     }
 
+    const { values, errors, isValid, handleChange, resetForm } =
+        useFormAndValidation({});
+
     useEffect(() => {
-        avatarRef.current.value = "";
+        resetForm();
+        avatarRef.current.value = null;
+        // eslint-disable-next-line
     }, [isOpen]);
 
     return (
         <PopupWithForm
-            isOpen={isOpen}
             name="edit-avatar"
             title="Обновить аватар"
+            isOpen={isOpen}
             onClose={onClose}
             onSubmit={handleSubmit}
-            buttonText="Сохранить"
+            buttonText={isLoading ? 'Сохранение...' : 'Сохранить'}
+            isValid={isValid}
         >
-            <input
-                className={`popup__input popup__input_card_url`}
-                name="avatar"
-                id="avatar"
-                placeholder="Ссылка на картинку"
-                type="url"
-                ref={avatarRef}
-                required
-            />
+            <label className='popup__container-field'>
+                <input
+                    className={`popup__input popup__input_card_url`}
+                    name="avatar"
+                    id="avatar"
+                    placeholder="Ссылка на картинку"
+                    type="url"
+                    ref={avatarRef}
+                    onChange={handleChange}
+                    value={values.avatar || ''}
+                    required
+                />
+                {errors.avatar && (
+                    <span className='avatar-link-error popup__input-error'>
+                        {errors.avatar}
+                    </span>
+                )}
+            </label>
+
         </PopupWithForm>
     )
 }
