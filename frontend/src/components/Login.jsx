@@ -1,28 +1,39 @@
-import React, { useEffect } from 'react';
-import useFormAndValidation from '../hooks/useFormAndValidation';
+import React, { useState } from "react";
 
 const initValues = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
 };
 
-const Login = ({ onLogin }) => {
-    const { values, errors, isValid, handleChange, setIsValid, resetForm } =
-        useFormAndValidation(initValues);
+function Login({ onLogin }) {
+    const [state, setState] = useState(initValues);
 
-    useEffect(() => {
-        setIsValid(false);
-        // eslint-disable-next-line
-    }, []);
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setState((old) => ({
+            ...old,
+            [name]: value,
+        }));
+    }
 
-    const handleSubmit = (evt) => {
-        evt.preventDefault();
+    function handleSubmit(e) {
+        e.preventDefault();
 
-        const { email, password } = values;
-
+        const { email, password } = state;
         if (!email || !password) return;
 
-        onLogin(email, password).then(() => resetForm());
+        onLogin(email, password)
+            .then(() => {
+                setState(initValues);
+            })
+            .catch((err) => {
+                console.log(`Ошибка: ${err}`);
+
+                setState((old) => ({
+                    ...old,
+                    message: "Что-то пошло не так!",
+                }));
+            });
     }
 
     return (
@@ -37,14 +48,12 @@ const Login = ({ onLogin }) => {
                     placeholder="Email"
                     minLength='6'
                     maxLength='40'
+                    value={state.email}
                     onChange={handleChange}
-                    value={values.email || ""}
                     required
-                    isValid={isValid}
+                    
                 />
-                {errors.email && (
-                    <span className='popup__input-error popup__input-error_visible'>{errors.email}</span>
-                )}
+                <span className='popup__input-error popup__input-error_visible'></span>
 
                 <input
                     className="login__input"
@@ -54,14 +63,11 @@ const Login = ({ onLogin }) => {
                     placeholder="Пароль"
                     minLength='6'
                     maxLength='40'
+                    value={state.password}
                     onChange={handleChange}
-                    value={values.password || ""}
                     required
-                    isValid={isValid}
                 />
-                {errors.password && (
-                    <span className='popup__input-error popup__input-error_visible'>{errors.password}</span>
-                )}
+                <span className='popup__input-error popup__input-error_visible'></span>
                 <button
                     className="login__button"
                     type="submit"

@@ -1,23 +1,14 @@
 class Api {
-    constructor(data) {
-        this._baseUrl = data.baseUrl;
-        this._headers = data.headers;
+    constructor({ baseUrl, headers }) {
+        this._baseUrl = baseUrl;
+        this._headers = headers;
     }
 
-    _checkResult(res) {
+    _getJsonOrError(res) {
         if (res.ok) {
             return res.json();
         }
-
         return Promise.reject(`Ошибка: ${res.status}`);
-    }
-
-    getInitialCards() {
-        return fetch(`${this._baseUrl}/cards`, {
-            credentials: 'include',
-            method: 'GET',
-            headers: this._headers,
-        }).then(this._checkResult);
     }
 
     getUserInfo() {
@@ -25,22 +16,18 @@ class Api {
             credentials: 'include',
             method: 'GET',
             headers: this._headers,
-        }).then(this._checkResult);
+        }).then(this._getJsonOrError);
     }
 
-    setUserInfo(data) {
-        return fetch(`${this._baseUrl}/users/me`, {
+    getInitialCards() {
+        return fetch(`${this._baseUrl}/cards`, {
             credentials: 'include',
-            method: 'PATCH',
+            method: 'GET',
             headers: this._headers,
-            body: JSON.stringify({
-                name: data.name,
-                about: data.about,
-            }),
-        }).then(this._checkResult);
+        }).then(this._getJsonOrError);
     }
 
-    addNewCard(data) {
+    addCard(data) {
         return fetch(`${this._baseUrl}/cards`, {
             credentials: 'include',
             method: 'POST',
@@ -49,34 +36,58 @@ class Api {
                 name: data.name,
                 link: data.link,
             }),
-        }).then(this._checkResult);
+        }).then(this._getJsonOrError);
     }
 
-    deleteCard(cardId) {
-        return fetch(`${this._baseUrl}/cards/${cardId}`, {
+    changeProfile(data) {
+        return fetch(`${this._baseUrl}/users/me`, {
             credentials: 'include',
-            method: 'DELETE',
+            method: "PATCH",
             headers: this._headers,
-        }).then(this._checkResult);
+            body: JSON.stringify({
+                name: data.name,
+                about: data.about,
+            }),
+        }).then(this._getJsonOrError);
     }
 
-    changeLikeCardStatus(cardId, isLiked) {
-        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-            credentials: 'include',
-            method: `${isLiked ? 'PUT' : 'DELETE'}`,
-            headers: this._headers,
-        }).then(this._checkResult);
-    }
-
-    setUserAvatar(data) {
+    changeAvatar(data) {
         return fetch(`${this._baseUrl}/users/me/avatar`, {
             credentials: 'include',
-            method: 'PATCH',
+            method: "PATCH",
             headers: this._headers,
             body: JSON.stringify({
                 avatar: data.avatar,
             }),
-        }).then(this._checkResult);
+        }).then(this._getJsonOrError);
+    }
+
+    deleteCard(data) {
+        return fetch(`${this._baseUrl}/cards/${data._id}`, {
+            credentials: 'include',
+            method: "DELETE",
+            headers: this._headers,
+        }).then(this._getJsonOrError);
+    }
+
+    putLikeCard(id) {
+        return fetch(`${this._baseUrl}/cards/${id}/likes`, {
+            credentials: 'include',
+            method: "PUT",
+            headers: this._headers,
+        }).then(this._getJsonOrError);
+    }
+
+    deleteLikeCard(id) {
+        return fetch(`${this._baseUrl}/cards/${id}/likes`, {
+            credentials: 'include',
+            method: "DELETE",
+            headers: this._headers,
+        }).then(this._getJsonOrError);
+    }
+
+    changeLikeCardStatus(card, isLiked) {
+        return isLiked ? this.putLikeCard(card._id) : this.deleteLikeCard(card._id)
     }
 }
 

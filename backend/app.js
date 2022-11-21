@@ -1,33 +1,55 @@
 require('dotenv').config();
 
+console.log(process.env.NODE_ENV);
 const express = require('express');
-const cookieParser = require('cookie-parser');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
+const { login, postUser, logout } = require('./controllers/userController');
+const { loginValid, userValid } = require('./middlewares/validation');
+const auth = require('./middlewares/auth');
+const errorsHandler = require('./middlewares/errorHandler');
+const NotFoundError = require('./utils/errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const routes = require('./routes');
-const centralizedErrorHandler = require('./middlewares/errorHandler');
-const corsHandler = require('./middlewares/corsHandler');
+const allowedCors = require('./middlewares/allowedCors');
 
-const { PORT = 3000, MONGO_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
-
-mongoose.connect(MONGO_URL);
+const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
-
-const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
-
-app.use(corsHandler);
 app.use(express.json());
-app.use(helmet());
-app.use(limiter);
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+mongoose.connect(MONGO_URL, {
+  useNewUrlParser: true,
+});
+
 app.use(requestLogger);
-app.use(routes);
+app.use(allowedCors);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
+app.post('/signin', loginValid, login);
+app.post('/signup', userValid, postUser);
+app.post('/logout', logout);
+app.use(auth);
+app.get('/signout', (req, res) => {
+  res.clearCookie('jwt').send({ message: 'Выход' });
+});
+app.use('/users', require('./routes/usersRouter'));
+app.use('/cards', require('./routes/cardsRouter'));
+
+app.use((req, res, next) => {
+  next(new NotFoundError('Маршрут не найден. '));
+});
+
+app.use(errorsHandler);
 app.use(errorLogger);
 app.use(errors());
-app.use(centralizedErrorHandler);
-console.log(process.env.NODE_ENV);
-app.listen(PORT);
+
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
+});

@@ -1,56 +1,51 @@
-const { celebrate, Joi } = require('celebrate');
+const { Joi, celebrate } = require('celebrate');
+const { REGEXP_URL } = require('../utils/constants');
 
-// eslint-disable-next-line no-useless-escape
-const urlRegExp = /^(https?:\/{2})(w{3})?([\w\-]+)(\.[\w\-]+)(\/[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]+)?/;
-
-const loginValidation = celebrate({
+module.exports.loginValid = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 });
 
-const userValidation = celebrate({
+module.exports.userValid = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(20),
-    avatar: Joi.string().pattern(urlRegExp),
+    avatar: Joi.string().pattern(REGEXP_URL),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
   }),
 });
 
-const userProfileValidation = celebrate({
+module.exports.userProfileValid = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }),
 });
 
-const userAvatarValidation = celebrate({
+module.exports.userAvatarValid = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(urlRegExp),
+    avatar: Joi.string().required().pattern(REGEXP_URL),
   }),
 });
 
-const idValidation = celebrate({
+module.exports.idUserValid = celebrate({
   params: Joi.object().keys({
-    _id: Joi.string().alphanum().length(24).hex(),
+    userId: Joi.string().length(24).hex(),
   }),
 });
 
-const cardValidation = celebrate({
+module.exports.idCardValid = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex(),
+  }),
+});
+
+module.exports.cardValid = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(urlRegExp),
+    link: Joi.string().required().pattern(REGEXP_URL),
   }),
 });
-
-module.exports = {
-  loginValidation,
-  userValidation,
-  userProfileValidation,
-  userAvatarValidation,
-  idValidation,
-  cardValidation,
-};

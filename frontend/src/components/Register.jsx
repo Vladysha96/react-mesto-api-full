@@ -1,26 +1,39 @@
-import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import useFormAndValidation from '../hooks/useFormAndValidation';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const initValues = {
-    email: '',
-    password: '',
+    email: "",
+    password: "",
 };
 
 function Register({ onRegister }) {
+    const [state, setState] = useState(initValues);
 
-    const { values, errors, isValid, handleChange, setIsValid, resetForm } =
-        useFormAndValidation(initValues);
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setState((old) => ({
+            ...old,
+            [name]: value,
+        }));
+    }
 
-    useEffect(() => {
-        setIsValid(false);
-        // eslint-disable-next-line
-    }, []);
+    function handleSubmit(e) {
+        e.preventDefault();
 
-    const handleSubmit = (evt) => {
-        evt.preventDefault();
-        const { email, password } = values;
-        onRegister(email, password).then(() => resetForm());
+        const { email, password } = state;
+
+        onRegister(email, password)
+            .then(() => {
+                setState(initValues);
+            })
+            .catch((err) => {
+                console.log(`Ошибка: ${err}`);
+
+                setState((old) => ({
+                    ...old,
+                    message: "Что-то пошло не так!",
+                }));
+            });
     }
 
     return (
@@ -36,13 +49,10 @@ function Register({ onRegister }) {
                     required
                     minLength='6'
                     maxLength='40'
-                    value={values.email || ""}
+                    value={state.email}
                     onChange={handleChange}
-                    isValid={isValid}
                 />
-                {errors.email && (
-                    <span className='popup__input-error popup__input-error_visible'>{errors.email}</span>
-                )}
+                <span className='popup__input-error popup__input-error_visible'></span>
 
                 <input
                     className="login__input"
@@ -53,13 +63,10 @@ function Register({ onRegister }) {
                     required
                     minLength='6'
                     maxLength='40'
-                    value={values.password || ""}
+                    value={state.password}
                     onChange={handleChange}
-                    isValid={isValid}
                 />
-                {errors.password && (
-                    <span className='popup__input-error popup__input-error_visible'>{errors.password}</span>
-                )}
+                <span className='popup__input-error popup__input-error_visible'></span>
 
                 <button
                     className="login__button"

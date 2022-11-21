@@ -1,21 +1,30 @@
-import React, { useEffect } from 'react';
-import PopupWithForm from './PopupWithForm';
-import useFormAndValidation from '../hooks/useFormAndValidation';
+import PopupWithForm from "./PopupWithForm";
+import { useState, useEffect } from "react";
 
-const AddPlacePopup = ({ isLoading, isOpen, onClose, onAddPlace }) => {
+function AddPlacePopup({ isOpen, onClose, onAddCard }) {
+    const [name, setName] = useState("");
+    const [link, setLink] = useState("");
 
-    const { values, errors, isValid, handleChange, resetForm } =
-        useFormAndValidation({});
+    function handleChange(e) {
+        if (e.target.name === "name") {
+            setName(e.target.value);
+        } else {
+            setLink(e.target.value);
+        }
+    }
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        onAddCard({
+            name: name,
+            link: link,
+        });
+    }
 
     useEffect(() => {
-        resetForm();
-    // eslint-disable-next-line
+        setName("");
+        setLink("");
     }, [isOpen]);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onAddPlace(values);
-    }
 
     return (
         <PopupWithForm
@@ -24,8 +33,7 @@ const AddPlacePopup = ({ isLoading, isOpen, onClose, onAddPlace }) => {
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={handleSubmit}
-            buttonText={isLoading ? 'Сохранение...' : 'Сохранить'}
-            isValid={isValid}
+            buttonText={"Создать"}
         >
             <label className='popup__container-field'>
                 <input
@@ -36,15 +44,11 @@ const AddPlacePopup = ({ isLoading, isOpen, onClose, onAddPlace }) => {
                     placeholder="Название"
                     minLength="2"
                     maxLength="30"
-                    value={values.name || ''}
                     onChange={handleChange}
+                    value={name}
                     required
                 />
-                {errors.name && (
-                    <span className='card-name-error popup__input-error'>
-                        {errors.name}
-                    </span>
-                )}
+                <span id="title-error" className="popup__input-error popup__input-error_visible"></span>
             </label>
 
             <label className='popup__container-field'>
@@ -54,15 +58,11 @@ const AddPlacePopup = ({ isLoading, isOpen, onClose, onAddPlace }) => {
                     id="link"
                     placeholder="Ссылка на картинку"
                     type="url"
-                    value={values.link || ''}
                     onChange={handleChange}
+                    value={link}
                     required
                 />
-                {errors.link && (
-                    <span className='card-link-error popup__input-error'>
-                        {errors.link}
-                    </span>
-                )}
+                <span id="link-error" className="popup__input-error popup__input-error_visible"></span>
             </label>
         </PopupWithForm>
     );

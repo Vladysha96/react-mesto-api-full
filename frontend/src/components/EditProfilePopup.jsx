@@ -1,30 +1,34 @@
 import PopupWithForm from "./PopupWithForm";
-import { useEffect, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { CurrentUserContext } from "../contexts/CurrentUserContext";
-import useFormAndValidation from '../hooks/useFormAndValidation';
 
-const EditProfilePopup = props => {
-    const { isOpen, onClose, onUpdateUser, isLoading } = props;
-
+function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
     const currentUser = useContext(CurrentUserContext);
 
-    const { values, errors, isValid, handleChange, setValues, resetForm, setIsValid } =
-        useFormAndValidation({});
+    const [name, setName] = useState("");
+    const [about, setAbout] = useState("");
 
-    useEffect(() => {
-        resetForm();
-        setValues(currentUser);
-        setIsValid(true);
-        // eslint-disable-next-line
-    }, [currentUser, isOpen]);
+    function handleChange(e) {
+        if (e.target.name === "name") {
+            setName(e.target.value);
+        } else {
+            setAbout(e.target.value);
+        }
+    }
 
-    const handleSubmit = (e) => {
+    function handleSubmit(e) {
         e.preventDefault();
         onUpdateUser({
-            name: values.name,
-            about: values.about,
+            // Передаём значения управляемых компонентов во внешний обработчик
+            name: name,
+            about: about,
         });
     }
+
+    useEffect(() => {
+        setName(currentUser.name);
+        setAbout(currentUser.about);
+    }, [currentUser, isOpen]);
 
     return (
         <PopupWithForm
@@ -33,8 +37,7 @@ const EditProfilePopup = props => {
             isOpen={isOpen}
             onClose={onClose}
             onSubmit={handleSubmit}
-            buttonText={isLoading ? 'Сохранение...' : 'Сохранить'}
-            isValid={isValid && values.name && values.about}
+            buttonText={"Сохранить"}
         >
             <label className='popup__container-field'>
                 <input
@@ -46,14 +49,10 @@ const EditProfilePopup = props => {
                     minLength="2"
                     maxLength="40"
                     required
-                    value={values.name || ''}
                     onChange={handleChange}
+                    value={name || ""}
                 />
-                {errors.name && (
-                    <span className='profile-name-error popup__input-error'>
-                        {errors.name}
-                    </span>
-                )}
+                <span className='popup__input-error popup__input-error_visible'></span>
             </label>
 
             <label className='popup__container-field'>
@@ -66,14 +65,10 @@ const EditProfilePopup = props => {
                     minLength="2"
                     maxLength="200"
                     required
-                    value={values.about || ''}
                     onChange={handleChange}
+                    value={about || ""}
                 />
-                {errors.about && (
-                    <span className='profile-about-error popup__input-error'>
-                        {errors.about}
-                    </span>
-                )}
+                <span className='popup__input-error popup__input-error_visible'></span>
             </label>
         </PopupWithForm>
     )

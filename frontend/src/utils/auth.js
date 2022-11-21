@@ -1,40 +1,45 @@
 export const BASE_URL = 'https://vladysha96.backend.nomoredomains.icu';
 
-const request = ({ url, token, method = "POST", data }) => {
+function request({ url, method = "POST", data, token }) {
     return fetch(`${BASE_URL}${url}`, {
-        method,
+        credentials: 'include',
+        mode: 'cors',
+        method: method,
         headers: {
-            'Accept': 'application/json',
             'Content-Type': 'application/json',
-            ...(!!token && { 'Authorization': `Bearer ${token}` }),
+            ...(!!token && { Authorization: `Bearer ${token}` }),
         },
         ...(!!data && { body: JSON.stringify(data) }),
     }).then((res) => {
         if (res.ok) {
             return res.json();
         }
-        return Promise.reject(res.status);
+        return Promise.reject(`Ошибка: ${res.status}`);
     });
 }
+
 export const register = (email, password) => {
     return request({
         url: "/signup",
         data: { email, password },
     });
-}
-export const login = (email, password) => {
+};
+
+export const authorization = (email, password) => {
     return request({
         url: "/signin",
         data: { email, password },
     });
-}
-export const checkToken = (token) => {
+};
+
+export const getContent = (token) => {
     return request({
         url: "/users/me",
         method: "GET",
         token,
     });
-}
+};
+
 export const logout = () => {
     return request({
         url: '/logout',

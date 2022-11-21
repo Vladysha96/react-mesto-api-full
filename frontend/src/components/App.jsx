@@ -1,21 +1,21 @@
-import { useEffect, useState, React } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Switch, useHistory } from 'react-router-dom';
-import Header from './Header.js';
-import Main from './Main.js';
-import Footer from './Footer.js';
-import AddPlacePopup from './AddPlacePopup.js';
-import EditAvatarPopup from './EditAvatarPopup.js';
-import EditProfilePopup from './EditProfilePopup.js';
-import ImagePopup from './ImagePopup.js';
-import SubmitPopup from './SubmitPopup.js';
-import api from '../utils/api.js';
-import Login from './Login.js';
-import Register from './Register.js';
+import Header from './Header';
+import Main from './Main';
+import Footer from './Footer';
+import AddPlacePopup from './AddPlacePopup';
+import EditAvatarPopup from './EditAvatarPopup';
+import EditProfilePopup from './EditProfilePopup';
+import ImagePopup from './ImagePopup';
+import SubmitPopup from './SubmitPopup';
+import api from '../utils/api';
+import Login from './Login';
+import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
 import InfoTooltip from './InfoTooltip';
 import PopupWithBurger from './PopupWithBurger';
-import * as auth from '../utils/auth.js';
-import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
+import * as auth from '../utils/auth';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 const App = () => {
   const [isEditProfilePopupOpen, setIsEditProfileOpen] = useState(false);
@@ -34,33 +34,43 @@ const App = () => {
   const [isMenuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    loggedIn && Promise.all([
-      api.getUserInfo(),
-      api.getInitialCards(),
-    ])
-      .then(([data, cards]) => {
-        setCurrentUser(data);
-        setCards(cards);
+    if (!loggedIn) return;
+    api
+      .getUserInfo()
+      .then((res) => {
+        setCurrentUser(res);
       })
       .catch((err) => {
-        console.log(err);
+        console.log(`Ошибка: ${err}`);
+      });
+
+    api
+      .getInitialCards()
+      .then((res) => {
+        setCards(res);
       })
-  }, [loggedIn])
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
+  }, [loggedIn]);
 
   useEffect(() => {
-    const jwt = localStorage.getItem('token');
-    if (jwt) {
-      auth.checkToken(jwt)
-        .then((res) => {
-          setEmail(res.data.email);
+    function tokenCheck() {
+      return auth
+        .getContent()
+        .then((data) => {
+          setEmail(data.email);
           setLoggedIn(true);
-          history.push('/');
+          history.push("/");
         })
         .catch((err) => {
-          console.log(err);
-        })
+          console.log(`Ошибка: ${err}`);
+        });
     }
-  }, [history])
+
+    tokenCheck();
+    // eslint-disable-next-line
+  }, []);
 
   const handleRegistration = (email, password) => {
     return auth
@@ -79,28 +89,27 @@ const App = () => {
 
   const handleLogin = (email, password) => {
     return auth
-      .login(email, password)
+      .authorization(email, password)
       .then((token) => {
-        if (!token) {
-          return Promise.reject('No token');
-        }
-
-        localStorage.setItem('token', token)
-        setEmail(email);
+        if (!token) return;
         setLoggedIn(true);
-        history.push('/');
+        history.push("/");
+        setEmail(email);
       })
       .catch((err) => {
+        console.log(`Ошибка: ${err}`);
         setInfoTooltipOpen(true);
-        console.log(err);
-      })
+        setStatus(false);
+      });
   }
 
   const handleLogOut = () => {
-    localStorage.removeItem('jwt');
+    auth.logout();
     setLoggedIn(false);
+    setEmail("");
     history.push('/sign-in');
-    setMenuOpen(!isMenuOpen)
+    setCards([]);
+    setCurrentUser({});
   }
 
   const handleMenuClick = () => {
