@@ -11,7 +11,6 @@ const auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorHandler');
 const NotFoundError = require('./utils/errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const allowedCors = require('./middlewares/allowedCors');
 
 const { PORT = 3001, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
@@ -40,12 +39,38 @@ app.use(cors({
   enablePreflight: true,
 }));
 
+const allowedCors = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'https://vladysha96.frontend.nomoredomains.icu/',
+  'http://vladysha96.frontend.nomoredomains.icu/',
+  'https://vladysha96.backend.nomoredomains.icu/',
+  'http://vladysha96.backend.nomoredomains.icu/',
+];
+
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+  const requestHeaders = req.headers['access-control-request-headers'];
+  const { method } = req;
+  const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+  res.header('Access-Control-Allow-Credentials', true);
+
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  if (method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    return res.end();
+  }
+  return next();
+});
+
 mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
 });
 
 app.use(requestLogger);
-app.use(allowedCors);
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
