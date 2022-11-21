@@ -15,7 +15,7 @@ const Header = props => {
                 {props.loggedIn ?
                     (<div className="header__container">
                         <p className="header__user-email">{props.email}</p>
-                        <Link className="header__exit" to="" onClick={props.onLogOut}>Выйти</Link>
+                        <Link className="header__exit" to="" onClick={props.logout}>Выйти</Link>
                     </div>) : (<Link to={path} className="header__link">{textTitle}</Link>)
                 }
             </div>

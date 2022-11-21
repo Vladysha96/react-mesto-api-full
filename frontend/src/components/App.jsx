@@ -8,7 +8,7 @@ import EditAvatarPopup from './EditAvatarPopup';
 import EditProfilePopup from './EditProfilePopup';
 import ImagePopup from './ImagePopup';
 import SubmitPopup from './SubmitPopup';
-import api from '../utils/api';
+import { api } from "../utils/api";
 import Login from './Login';
 import Register from './Register';
 import ProtectedRoute from './ProtectedRoute';
@@ -53,64 +53,6 @@ const App = () => {
         console.log(`Ошибка: ${err}`);
       });
   }, [loggedIn]);
-
-  useEffect(() => {
-    function tokenCheck() {
-      return auth
-        .getContent()
-        .then((data) => {
-          setEmail(data.email);
-          setLoggedIn(true);
-          history.push("/");
-        })
-        .catch((err) => {
-          console.log(`Ошибка: ${err}`);
-        });
-    }
-
-    tokenCheck();
-    // eslint-disable-next-line
-  }, []);
-
-  const handleRegistration = (email, password) => {
-    return auth
-      .register(email, password)
-      .then(() => {
-        setStatus(true)
-        setInfoTooltipOpen(true)
-        history.push('/sign-in');
-      })
-      .catch((err) => {
-        setStatus(false)
-        setInfoTooltipOpen(true)
-        console.log(err);
-      })
-  }
-
-  const handleLogin = (email, password) => {
-    return auth
-      .authorization(email, password)
-      .then((token) => {
-        if (!token) return;
-        setLoggedIn(true);
-        history.push("/");
-        setEmail(email);
-      })
-      .catch((err) => {
-        console.log(`Ошибка: ${err}`);
-        setInfoTooltipOpen(true);
-        setStatus(false);
-      });
-  }
-
-  const handleLogOut = () => {
-    auth.logout();
-    setLoggedIn(false);
-    setEmail("");
-    history.push('/sign-in');
-    setCards([]);
-    setCurrentUser({});
-  }
 
   const handleMenuClick = () => {
     setMenuOpen(!isMenuOpen)
@@ -162,38 +104,28 @@ const App = () => {
     }
   }, [isOpen])
 
-  const handleUpdateUser = ({ name, about }) => {
+  const handleUpdateUser = (card) => {
     api
-      .setUserInfo({ name, about })
-      .then(() => {
-        setCurrentUser({
-          name,
-          about,
-          avatar: currentUser.avatar,
-          _id: currentUser._id,
-        });
-        closeAllPopups();
-      })
-      .catch((err) =>
-        console.log(`Ошибка при обновлении name, about: ${err}`)
-      )
-  }
-
-  const handleUpdateAvatar = ({ avatar }) => {
-    api
-      .setAvatar({ avatar })
-      .then(() => {
-        setCurrentUser({
-          name: currentUser.name,
-          about: currentUser.about,
-          avatar,
-          _id: currentUser._id,
-        });
+      .changeProfile(card)
+      .then((res) => {
+        setCurrentUser(res);
         closeAllPopups();
       })
       .catch((err) => {
-        console.log(`Ошибка при обновлении аватара: ${err}`);
+        console.log(`Ошибка: ${err}`);
+      });
+  }
+
+  const handleUpdateAvatar = (card) => {
+    api
+      .changeAvatar(card)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
       })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
   }
 
   const handleCardLike = (card) => {
@@ -212,9 +144,9 @@ const App = () => {
 
   const handleCardDelete = (card) => {
     api
-      .deleteItem(card)
+      .deleteCard(card)
       .then(() => {
-        setCards(cards.filter((c) => c._id !== card._id));
+        setCards((state) => state.filter((c) => card._id !== c._id));
         closeAllPopups();
       })
       .catch((err) => {
@@ -222,43 +154,81 @@ const App = () => {
       });
   }
 
-  const handleAddPlaceSubmit = (newCard) => {
+  const handleAddPlaceSubmit = (card) => {
     api
-      .addPlace(newCard)
+      .addCard(card)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
       })
-      .catch((err) =>
-        console.log(`Ошибка при создании новой карточки: ${err}`)
-      )
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
+  }
+
+  const handleRegistration = (email, password) => {
+    return auth
+      .register(email, password)
+      .then(() => {
+        setStatus(true)
+        setInfoTooltipOpen(true)
+        history.push('/sign-in');
+      })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+        setInfoTooltipOpen(true);
+        setStatus(false);
+      });
+  }
+
+  const handleLogin = (email, password) => {
+    return auth
+      .authorization(email, password)
+      .then((token) => {
+        if (!token) return;
+        setLoggedIn(true);
+        history.push("/");
+        setEmail(email);
+      })
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+        setInfoTooltipOpen(true);
+        setStatus(false);
+      });
+  }
+
+  const handleLogOut = () => {
+    auth.logout();
+    setLoggedIn(false);
+    setEmail("");
+    history.push('/sign-in');
+    setCards([]);
+    setCurrentUser({});
   }
 
   useEffect(() => {
-    api
-      .getUserInfo()
-      .then(({ name, about, avatar, _id }) => {
-        setCurrentUser({ name, about, avatar, _id });
-      })
-      .catch((err) =>
-        console.log(`Ошибка при загрузке данных: ${err}`)
-      )
+    function tokenCheck() {
+      return auth
+        .getContent()
+        .then((data) => {
+          setEmail(data.email);
+          setLoggedIn(true);
+          history.push("/");
+        })
+        .catch((err) => {
+          console.log(`Ошибка: ${err}`);
+        });
+    }
 
-    api
-      .getInitialCards()
-      .then((initialCards) => setCards(initialCards))
-      .catch((err) =>
-        console.log(
-          `Ошибка при создании карточек: ${err}`
-        )
-      )
+    tokenCheck();
+    // eslint-disable-next-line
   }, []);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
       <PopupWithBurger isOpen={isMenuOpen} onClose={closeAllPopups} onLogOut={handleLogOut} email={email} />
       <div className="page" >
-        <Header onLogOut={handleLogOut} email={email} loggedIn={loggedIn} onBurger={handleMenuClick} />
+        <Header logout={handleLogOut} email={email} loggedIn={loggedIn} onBurger={handleMenuClick} />
 
         <Switch>
           <ProtectedRoute exact path="/"

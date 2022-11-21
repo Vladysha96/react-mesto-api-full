@@ -27,7 +27,7 @@ class Api {
         }).then(this._getJsonOrError);
     }
 
-    addPlace(data) {
+    addCard(data) {
         return fetch(`${this._baseUrl}/cards`, {
             credentials: 'include',
             method: 'POST',
@@ -39,7 +39,7 @@ class Api {
         }).then(this._getJsonOrError);
     }
 
-    setUserInfo(data) {
+    changeProfile(data) {
         return fetch(`${this._baseUrl}/users/me`, {
             credentials: 'include',
             method: "PATCH",
@@ -51,7 +51,7 @@ class Api {
         }).then(this._getJsonOrError);
     }
 
-    setAvatar(data) {
+    changeAvatar(data) {
         return fetch(`${this._baseUrl}/users/me/avatar`, {
             credentials: 'include',
             method: "PATCH",
@@ -62,7 +62,7 @@ class Api {
         }).then(this._getJsonOrError);
     }
 
-    deleteItem(data) {
+    deleteCard(data) {
         return fetch(`${this._baseUrl}/cards/${data._id}`, {
             credentials: 'include',
             method: "DELETE",
@@ -91,12 +91,10 @@ class Api {
     }
 }
 
-const api = new Api({
-    baseUrl: 'https://vladysha96.backend.nomoredomains.icu',
+export const api = new Api({
+    baseUrl: "https://vladysha96.backend.nomoredomains.icu",
     credentials: 'include',
     headers: {
         'Content-Type': 'application/json',
     },
 });
-
-export default api;

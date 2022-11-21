@@ -3,7 +3,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
 const { errors } = require('celebrate');
 const { login, postUser, logout } = require('./controllers/userController');
 const { loginValid, userValid } = require('./middlewares/validation');
@@ -11,27 +10,21 @@ const auth = require('./middlewares/auth');
 const errorsHandler = require('./middlewares/errorHandler');
 const NotFoundError = require('./utils/errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const allowedCors = require('./middlewares/allowedCors');
 
 const { PORT = 3001, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
-
-const corsOptions = {
-  origin: '*',
-  credentials: true,
-  optionOkStatus: 200,
-};
 
 const app = express();
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(cors(corsOptions));
-
 mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
 });
 
 app.use(requestLogger);
+app.use(allowedCors);
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Сервер сейчас упадёт');
