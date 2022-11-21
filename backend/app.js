@@ -19,12 +19,7 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-const corsOptions = {
-  origin: 'http://vladysha96.frontend.nomoredomains.icu',
-};
-
-app.use(cors(corsOptions));
+app.use(cors(allowedCors));
 
 mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
