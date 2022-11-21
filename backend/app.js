@@ -14,12 +14,18 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const { PORT = 3001, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
+const corsOptions = {
+  origin: '*',
+  credentials: true,
+  optionOkStatus: 200,
+};
+
 const app = express();
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 mongoose.connect(MONGO_URL, {
   useNewUrlParser: true,
