@@ -92,7 +92,7 @@ class Api {
 }
 
 const api = new Api({
-    baseUrl: 'http://vladysha96.backend.nomoredomains.icu',
+    baseUrl: 'https://vladysha96.backend.nomoredomains.icu',
     credentials: 'include',
     headers: {
         'Content-Type': 'application/json',
