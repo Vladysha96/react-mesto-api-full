@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://vladysha96.backend.nomoredomains.icu';
+export const BASE_URL = 'http://localhost:3001';
 
 function request({ url, method = "POST", data, token }) {
     return fetch(`${BASE_URL}${url}`, {

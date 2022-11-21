@@ -1,6 +1,4 @@
 require('dotenv').config();
-
-console.log(process.env.NODE_ENV);
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -14,7 +12,7 @@ const NotFoundError = require('./utils/errors/NotFoundError');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const allowedCors = require('./middlewares/allowedCors');
 
-const { PORT = 3000, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
+const { PORT = 3001, MONGO_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
 app.use(express.json());

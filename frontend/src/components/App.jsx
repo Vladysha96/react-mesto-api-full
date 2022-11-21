@@ -197,34 +197,34 @@ const App = () => {
   }
 
   const handleCardLike = (card) => {
-    const isLiked = card.likes.some((i) => i._id === currentUser._id);
+    const isLiked = card.likes.includes(currentUser._id);
     api
-      .changeLikeCardStatus(card._id, !isLiked)
+      .changeLikeCardStatus(card, !isLiked)
       .then((newCard) => {
         setCards((state) =>
           state.map((c) => (c._id === card._id ? newCard : c))
         );
       })
-      .catch((err) =>
-        console.log(`Ошибка при добавлении/удалении лайка: ${err}`)
-      )
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
   }
 
   const handleCardDelete = (card) => {
     api
-      .deleteItem(card._id)
+      .deleteItem(card)
       .then(() => {
         setCards(cards.filter((c) => c._id !== card._id));
         closeAllPopups();
       })
-      .catch((err) =>
-        console.log(`Ошибка при удалении карточки: ${err}`)
-      )
+      .catch((err) => {
+        console.log(`Ошибка: ${err}`);
+      });
   }
 
   const handleAddPlaceSubmit = (newCard) => {
     api
-      .addItem(newCard)
+      .addPlace(newCard)
       .then((newCard) => {
         setCards([newCard, ...cards]);
         closeAllPopups();
